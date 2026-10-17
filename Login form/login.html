@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wash Track System - Login</title>
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="leftside design/design.css">
+  <link rel="stylesheet" href="logo design/logo.css">
+
+</head>
+<body>
+  <div class="page">
+
+    <!-- Starfield background (Uiverse.io by amir_6539) -->
+    <div class="space">
+      <div id="stars"></div>
+      <div id="stars2"></div>
+      <div id="stars3"></div>
+    </div>
+
+    <!-- Login card -->
+    <form class="login-form" id="loginForm" novalidate>
+      <img src="img_avatar2.png" alt="User avatar" class="avatar">
+
+      <div class="brand">Wash Track System</div>
+      <p class="sub">Welcome to wash track system</p>
+
+      <h2>Welcome Back!</h2>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@gmail.com" autocomplete="username" autofocus>
+
+      <label for="password">Password</label>
+      <div class="pw">
+        <input type="password" id="password" placeholder="password" autocomplete="current-password">
+        <button type="button" class="toggle" id="toggle" aria-label="Show password">Show</button>
+      </div>
+
+      <p id="error" class="error" role="alert" aria-live="polite"></p>
+
+      <button type="submit" class="btn">login</button>
+
+      <p class="shop">Fronia Laundry · Fairview, Quezon City</p>
+    </form>
+
+  </div>
+
+  <!-- login.js asks the Node.js server to check the account in SQL Server -->
+  <script src="login.js"></script>
+</body>
+</html>

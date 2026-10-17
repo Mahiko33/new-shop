@@ -1,0 +1,23 @@
+{
+  "name": "washtrack-server",
+  "version": "1.0.0",
+  "description": "Wash Track System for Fronia Laundry - Node.js + Microsoft SQL Server backend",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node database/seed.js",
+    "seed:users": "node database/seed.js --users-only"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mssql": "^11.0.1"
+  }
+}

@@ -1,0 +1,10 @@
+.avatar {
+  display: block;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 16px;       /* centers it and adds space above "Welcome Back!" */
+  border-radius: 50%;        /* makes the square image a circle */
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}

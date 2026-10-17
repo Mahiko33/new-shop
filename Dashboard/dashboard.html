@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wash Track System</title>
+  <!-- The Node.js server only sends this page to someone who is logged in -->
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR: each link opens a page below (the part after # is the page name) -->
+  <aside class="side">
+    <div class="brand"><span class="mark">WT</span> Wash Track</div>
+    <p class="grp">Overview</p>
+    <a href="#dashboard" data-page="dashboard">Dashboard</a>
+    <p class="grp">Operations</p>
+    <a href="#appointments" data-page="appointments">Appointments <span class="badge" id="b-appt"></span></a>
+    <a href="#transactions" data-page="transactions">Transactions <span class="badge" id="b-tx"></span></a>
+    <a href="#deliveries" data-page="deliveries">Deliveries <span class="badge" id="b-dlv"></span></a>
+    <p class="grp">Finance</p>
+    <a href="#expenses" data-page="expenses">Expenses</a>
+    <a href="#reports" data-page="reports">Income Reports</a>
+    <div class="side-foot">
+      <a href="../Login%20form/login.html" id="logout">Log out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div>
+        <h1 id="pageTitle">Owner Dashboard</h1>
+        <p class="muted" id="today"></p>
+      </div>
+      <div class="who"><span class="muted" id="whoName">Fronia Laundry</span><img src="../Login%20form/img_avatar2.png" alt="Owner" class="avatar"></div>
+    </header>
+
+    <p class="sample" id="status" hidden></p>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section class="page" id="page-dashboard">
+      <section class="kpis">
+        <div class="kpi g1"><span>Today's Sales</span><b id="k-today"></b><small id="k-today-n"></small></div>
+        <div class="kpi g2"><span>Income This Month</span><b id="k-income"></b><small id="k-delta"></small></div>
+        <div class="kpi mini"><span>Expenses This Month</span><b id="k-exp"></b></div>
+        <div class="kpi mini"><span>Net This Month</span><b id="k-net"></b></div>
+      </section>
+
+      <section class="row r1">
+        <div class="card">
+          <div class="ch"><h3 id="lineTitle">Income vs Expenses (monthly)</h3>
+            <div class="legend"><i class="d a"></i>Income <i class="d b"></i>Expenses</div></div>
+          <svg id="line" viewBox="0 0 640 240" role="img" aria-label="Monthly income and expenses"></svg>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Orders per Weekday</h3><span class="muted">last 4 weeks</span></div>
+          <svg id="bars" viewBox="0 0 300 240" role="img" aria-label="Orders per weekday"></svg>
+        </div>
+      </section>
+
+      <section class="row r2">
+        <div class="card">
+          <div class="ch"><h3>Sales Breakdown</h3><span class="muted">this month</span></div>
+          <div class="dn"><svg id="d1" viewBox="0 0 120 120"></svg><ul class="lg" id="l1"></ul></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Delivery Status</h3><span class="muted">this month</span></div>
+          <div class="dn"><svg id="d2" viewBox="0 0 120 120"></svg><ul class="lg" id="l2"></ul></div>
+        </div>
+        <div class="card wide">
+          <div class="ch"><h3>Recent Transactions</h3><a href="#transactions" class="link">View all</a></div>
+          <div class="tw"><table>
+            <thead><tr><th>Customer</th><th>Service</th><th>Add-ons</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="tx"></tbody>
+          </table></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= APPOINTMENTS ================= -->
+    <section class="page" id="page-appointments" hidden>
+      <div class="card">
+        <div class="ch">
+          <div class="tabs" id="apptTabs">
+            <button type="button" data-tab="today" class="on">Today</button>
+            <button type="button" data-tab="upcoming">Upcoming</button>
+            <button type="button" data-tab="past">Past</button>
+          </div>
+          <span class="muted" id="apptCount"></span>
+        </div>
+        <p class="muted note">Pickups and drop-offs that customers booked online. "Customer arrived" or "Picked up" opens a new transaction with their details filled in.</p>
+        <div class="tw"><table>
+          <thead><tr><th>Time</th><th>Customer</th><th>Type</th><th>Service</th><th>Pickup staff</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="apptBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= TRANSACTIONS ================= -->
+    <section class="page" id="page-transactions" hidden>
+      <section class="row r1">
+        <form class="card form" id="txForm" novalidate>
+          <div class="ch"><h3>New transaction</h3><span class="muted" id="fromAppt"></span></div>
+          <div class="fgrid">
+            <label>Customer name<input name="customer" list="customerList" autocomplete="off" required></label>
+            <label>Mobile number <small>(for the SMS)</small><input name="phone" placeholder="09XXXXXXXXX" inputmode="numeric" required></label>
+            <label>Service<select name="service"></select></label>
+            <label>Quantity <small id="qtyUnit"></small><input name="qty" type="number" min="0" step="0.5" required></label>
+            <label>Coat hangers <small id="hangerFee"></small><input name="hanger" type="number" min="0" value="0"></label>
+            <label>Steam pressing <small id="steamFee"></small><input name="steam" type="number" min="0" value="0"></label>
+          </div>
+          <label class="check"><input type="checkbox" name="rush"> <span>Rush order <small id="rushFee"></small></span></label>
+          <div class="fgrid">
+            <label>Return to customer by
+              <select name="fulfil"><option>Pickup at shop</option><option>Home delivery</option></select></label>
+            <label>Payment
+              <select name="payment"><option value="">Not yet paid</option><option>Cash</option><option>GCash</option></select></label>
+            <label class="full" id="addrRow" hidden>Delivery address<input name="address"></label>
+            <label id="staffRow" hidden>Delivery staff<select name="staff"></select></label>
+          </div>
+          <datalist id="customerList"></datalist>
+        </form>
+        <div class="card bill">
+          <div class="ch"><h3>Bill</h3></div>
+          <div id="billLines"></div>
+          <p class="err" id="txErr" role="alert"></p>
+          <button type="submit" form="txForm" class="btn">Save transaction</button>
+        </div>
+      </section>
+
+      <div class="card">
+        <div class="ch">
+          <h3>All transactions</h3>
+          <div class="tools">
+            <input type="search" id="txSearch" placeholder="Search name, phone or order no." aria-label="Search transactions">
+            <select id="txFilter" aria-label="Filter transactions">
+              <option value="active">In progress</option><option value="all">All</option>
+              <option value="unpaid">Unpaid</option><option value="today">Today</option>
+            </select>
+            <button type="button" class="btn ghost" id="txExport">Export CSV</button>
+          </div>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>Order no.</th><th>Date</th><th>Customer</th><th>Service</th><th>Add-ons</th><th>Total</th><th>Payment</th><th>Status</th><th>Next step</th></tr></thead>
+          <tbody id="txBody"></tbody>
+        </table></div>
+        <div class="foot"><span class="muted" id="txCount"></span><button type="button" class="btn ghost" id="txMore">Show more</button></div>
+      </div>
+    </section>
+
+    <!-- ================= DELIVERIES ================= -->
+    <section class="page" id="page-deliveries" hidden>
+      <section class="kpis" id="dlvKpis"></section>
+      <div class="card">
+        <div class="ch"><h3>Active deliveries</h3><span class="muted">assign staff, send out, then mark delivered or returned</span></div>
+        <div class="tw"><table>
+          <thead><tr><th>Order</th><th>Customer</th><th>Address</th><th>Staff</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="dlvBody"></tbody>
+        </table></div>
+      </div>
+      <section class="row r3">
+        <div class="card" id="staffCards"></div>
+        <div class="card">
+          <div class="ch"><h3>Incident log</h3><span class="muted" id="incCount"></span></div>
+          <div class="tw"><table>
+            <thead><tr><th>Date</th><th>Order</th><th>Staff</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody id="incBody"></tbody>
+          </table></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= EXPENSES ================= -->
+    <section class="page" id="page-expenses" hidden>
+      <section class="row r1">
+        <div class="card">
+          <div class="ch">
+            <h3 id="expTitle">Expenses</h3>
+            <div class="tools">
+              <select id="expMonth" aria-label="Month"></select>
+              <select id="expYear" aria-label="Year"></select>
+              <button type="button" class="btn ghost" id="expExport">Export CSV</button>
+            </div>
+          </div>
+          <p class="big" id="expTotal"></p>
+          <div class="tw"><table>
+            <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead>
+            <tbody id="expBody"></tbody>
+          </table></div>
+        </div>
+        <div>
+          <form class="card form" id="expForm" novalidate>
+            <div class="ch"><h3>Add expense</h3></div>
+            <label>Date<input type="date" name="date" required></label>
+            <label>Category<select name="category"></select></label>
+            <label>Description<input name="description" placeholder="e.g. Detergent, 5 gallons" required></label>
+            <label>Amount (₱)<input type="number" name="amount" min="0" step="0.01" required></label>
+            <p class="err" id="expErr" role="alert"></p>
+            <button type="submit" class="btn">Add expense</button>
+          </form>
+          <div class="card gap">
+            <div class="ch"><h3>By category</h3></div>
+            <ul class="bars" id="expCats"></ul>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= INCOME REPORTS ================= -->
+    <section class="page" id="page-reports" hidden>
+      <div class="tools reportTools">
+        <div class="tabs" id="repTabs">
+          <button type="button" data-mode="day">Daily</button>
+          <button type="button" data-mode="month" class="on">Monthly</button>
+          <button type="button" data-mode="year">Yearly</button>
+        </div>
+        <input type="date" id="repDay" aria-label="Day">
+        <select id="repMonth" aria-label="Month"></select>
+        <select id="repYear" aria-label="Year"></select>
+        <button type="button" class="btn ghost" id="repExport">Export CSV</button>
+        <button type="button" class="btn ghost" id="repPrint">Print</button>
+      </div>
+      <h2 class="repTitle" id="repTitle"></h2>
+      <section class="kpis" id="repKpis"></section>
+      <section class="row r1">
+        <div class="card">
+          <div class="ch"><h3 id="repTableTitle">Breakdown</h3></div>
+          <div class="tw"><table id="repTable"></table></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Where sales came from</h3></div>
+          <ul class="bars" id="repBreak"></ul>
+          <div class="ch gap"><h3>Payments</h3></div>
+          <ul class="bars" id="repPay"></ul>
+          <p class="muted note">Taxes and government contributions are not computed by the system.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<!-- pop-up for logging a returned delivery -->
+<dialog id="returnDialog">
+  <form method="dialog" id="returnForm">
+    <h3>Returned for re-cleaning</h3>
+    <p class="muted" id="returnInfo"></p>
+    <label>What went wrong?
+      <select name="reason">
+        <option>Stain still on garment</option><option>Wrong items delivered</option>
+        <option>Item damaged in transit</option><option>Customer not satisfied with cleaning</option><option>Other</option>
+      </select></label>
+    <p class="muted note">Call the customer to explain the delay. The order goes back to Washing.</p>
+    <div class="dlg-btns">
+      <button type="button" class="btn ghost" id="returnCancel">Cancel</button>
+      <button type="submit" class="btn danger">Log return</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Order matters: data first, then the dashboard charts, then the other pages -->
+<script src="data.js"></script>
+<script src="dashboard.js"></script>
+<script src="pages.js"></script>
+</body>
+</html>
